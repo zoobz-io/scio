@@ -1,0 +1,116 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    # Security-critical linters
+    - gosec        # Comprehensive security analyzer
+    - errorlint    # Proper error handling patterns
+    - noctx        # HTTP requests must have context
+    - bodyclose    # HTTP response body must be closed
+    - sqlclosecheck # SQL rows/statements must be closed
+
+    # Code quality with security implications
+    - govet        # Suspicious constructs
+    - ineffassign  # Detect ineffectual assignments
+    - staticcheck  # Advanced static analysis
+    - unused       # Unused code detection
+
+    # Error handling
+    - errcheck     # Unchecked errors
+    - errchkjson   # JSON marshaling errors
+    - wastedassign # Wasted assignments
+
+    # Best practices
+    - gocritic     # Opinionated linter
+    - revive       # Fast, configurable linter
+    - unconvert    # Unnecessary type conversions
+    - dupl         # Code duplication
+    - goconst      # Repeated strings as constants
+    - misspell     # Spelling mistakes
+    - prealloc     # Slice capacity hints
+    - copyloopvar  # Loop variable capture
+
+  exclusions:
+    rules:
+      # Test files can have longer functions, repeated strings, and unchecked errors
+      - path: _test\.go
+        linters:
+          - funlen
+          - goconst
+          - dupl
+          - govet
+          - errcheck
+
+  settings:
+    gosec:
+      severity: medium
+      confidence: medium
+      excludes:
+        - G104  # We'll use errcheck instead
+      config:
+        global:
+          audit: true
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment  # Struct layout optimization not critical for this library
+
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - (io.Closer).Close  # Handled by bodyclose
+
+    revive:
+      severity: warning
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: empty-block
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: exported
+        - name: if-return
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: modifies-parameter
+        - name: modifies-value-receiver
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: string-of-int
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-return
+        - name: unnecessary-stmt
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: unused-receiver
+        - name: useless-break
+        - name: var-declaration
+        - name: var-naming
+
+    dupl:
+      threshold: 150
+
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+
+    misspell:
+      locale: US
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: false

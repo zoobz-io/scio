@@ -1,0 +1,126 @@
+// Package scio provides a URI-based data catalog with atomic operations.
+// It serves as the authoritative map of data sources, providing topology
+// intelligence and type-agnostic access via atoms.
+package scio
+
+import (
+	"context"
+	"time"
+
+	"github.com/zoobzio/atom"
+	"github.com/zoobzio/edamame"
+	"github.com/zoobzio/grub"
+)
+
+// Variant represents a storage type.
+type Variant string
+
+const (
+	// VariantDatabase represents SQL database storage (db://).
+	VariantDatabase Variant = "db"
+
+	// VariantStore represents key-value storage (kv://).
+	VariantStore Variant = "kv"
+
+	// VariantBucket represents blob/object storage (bcs://).
+	VariantBucket Variant = "bcs"
+)
+
+// URI represents a parsed data address.
+type URI struct {
+	Variant  Variant
+	Resource string // table, store, or bucket name
+	Key      string // record key or blob path (may be empty for queries)
+}
+
+// Resource represents a registered data source.
+type Resource struct {
+	URI      string
+	Variant  Variant
+	Name     string
+	Spec     atom.Spec
+	Metadata Metadata
+}
+
+// Metadata holds resource annotations for system use.
+type Metadata struct {
+	Description string
+	Version     string
+	Tags        map[string]string
+}
+
+// Catalog defines topology introspection operations.
+type Catalog interface {
+	// Sources returns all registered resources.
+	Sources() []Resource
+
+	// Databases returns all db:// resources.
+	Databases() []Resource
+
+	// Stores returns all kv:// resources.
+	Stores() []Resource
+
+	// Buckets returns all bcs:// resources.
+	Buckets() []Resource
+
+	// Spec returns the atom spec for a specific resource.
+	Spec(uri string) (atom.Spec, error)
+
+	// FindBySpec returns all resources sharing the given spec (by FQDN).
+	FindBySpec(spec atom.Spec) []Resource
+
+	// FindByField returns all resources containing the given field.
+	FindByField(field string) []Resource
+
+	// Related returns other resources with the same spec as the given URI.
+	Related(uri string) []Resource
+}
+
+// Operations defines data access operations.
+type Operations interface {
+	// Get retrieves an atom at the given URI.
+	// Returns ErrNotFound if the key does not exist.
+	Get(ctx context.Context, uri string) (*atom.Atom, error)
+
+	// Set stores an atom at the given URI.
+	Set(ctx context.Context, uri string, data *atom.Atom) error
+
+	// Delete removes the record at the given URI.
+	// Returns ErrNotFound if the key does not exist.
+	Delete(ctx context.Context, uri string) error
+
+	// Exists checks whether a record exists at the given URI.
+	Exists(ctx context.Context, uri string) (bool, error)
+
+	// Query executes a query statement against a database resource.
+	// The URI should reference a db:// resource without a key.
+	Query(ctx context.Context, uri string, stmt edamame.QueryStatement, params map[string]any) ([]*atom.Atom, error)
+
+	// Select executes a select statement against a database resource.
+	// The URI should reference a db:// resource without a key.
+	Select(ctx context.Context, uri string, stmt edamame.SelectStatement, params map[string]any) (*atom.Atom, error)
+
+	// SetWithTTL stores an atom at the given kv:// URI with a TTL.
+	// TTL of 0 means no expiration.
+	SetWithTTL(ctx context.Context, uri string, data *atom.Atom, ttl time.Duration) error
+
+	// Put stores a blob object at the given bcs:// URI.
+	Put(ctx context.Context, uri string, obj *grub.AtomicObject) error
+
+	// NOTE: List operation for bcs:// is deferred pending grub.AtomicBucket interface extension.
+}
+
+// Registry defines resource registration operations.
+type Registry interface {
+	// RegisterDatabase registers an atomic database at the given URI.
+	// The URI should be in the form db://table.
+	RegisterDatabase(uri string, db grub.AtomicDatabase, opts ...RegistrationOption) error
+
+	// RegisterStore registers an atomic store at the given URI.
+	// The URI should be in the form kv://store.
+	RegisterStore(uri string, store grub.AtomicStore, opts ...RegistrationOption) error
+
+	// RegisterBucket registers an atomic bucket at the given URI.
+	// The URI should be in the form bcs://bucket.
+	RegisterBucket(uri string, bucket grub.AtomicBucket, opts ...RegistrationOption) error
+}
