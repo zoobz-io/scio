@@ -10,6 +10,7 @@ import (
 	"github.com/zoobzio/atom"
 	"github.com/zoobzio/edamame"
 	"github.com/zoobzio/grub"
+	"github.com/zoobzio/vecna"
 )
 
 // Variant represents a storage type.
@@ -24,6 +25,9 @@ const (
 
 	// VariantBucket represents blob/object storage (bcs://).
 	VariantBucket Variant = "bcs"
+
+	// VariantIndex represents vector index storage (idx://).
+	VariantIndex Variant = "idx"
 )
 
 // URI represents a parsed data address.
@@ -62,6 +66,9 @@ type Catalog interface {
 
 	// Buckets returns all bcs:// resources.
 	Buckets() []Resource
+
+	// Indexes returns all idx:// resources.
+	Indexes() []Resource
 
 	// Spec returns the atom spec for a specific resource.
 	Spec(uri string) (atom.Spec, error)
@@ -123,4 +130,42 @@ type Registry interface {
 	// RegisterBucket registers an atomic bucket at the given URI.
 	// The URI should be in the form bcs://bucket.
 	RegisterBucket(uri string, bucket grub.AtomicBucket, opts ...RegistrationOption) error
+
+	// RegisterIndex registers an atomic index at the given URI.
+	// The URI should be in the form idx://index.
+	RegisterIndex(uri string, index grub.AtomicIndex, opts ...RegistrationOption) error
+}
+
+// IndexOperations defines vector index access operations.
+type IndexOperations interface {
+	// GetVector retrieves a vector at the given idx:// URI.
+	// The URI should include a UUID key component.
+	// Returns ErrNotFound if the ID does not exist.
+	GetVector(ctx context.Context, uri string) (*grub.AtomicVector, error)
+
+	// UpsertVector stores a vector with metadata at the given idx:// URI.
+	// The URI should include a UUID key component.
+	UpsertVector(ctx context.Context, uri string, vector []float32, metadata *atom.Atom) error
+
+	// DeleteVector removes the vector at the given idx:// URI.
+	// The URI should include a UUID key component.
+	// Returns ErrNotFound if the ID does not exist.
+	DeleteVector(ctx context.Context, uri string) error
+
+	// VectorExists checks whether a vector exists at the given idx:// URI.
+	// The URI should include a UUID key component.
+	VectorExists(ctx context.Context, uri string) (bool, error)
+
+	// SearchVectors performs similarity search against an idx:// resource.
+	// The URI should reference the index without a key component.
+	// Returns the k nearest neighbors, optionally filtered by metadata.
+	SearchVectors(ctx context.Context, uri string, vector []float32, k int, filter *atom.Atom) ([]grub.AtomicVector, error)
+
+	// QueryVectors performs similarity search with vecna filter support.
+	// The URI should reference the index without a key component.
+	QueryVectors(ctx context.Context, uri string, vector []float32, k int, filter *vecna.Filter) ([]grub.AtomicVector, error)
+
+	// FilterVectors returns vectors matching the metadata filter without similarity search.
+	// The URI should reference the index without a key component.
+	FilterVectors(ctx context.Context, uri string, filter *vecna.Filter, limit int) ([]grub.AtomicVector, error)
 }

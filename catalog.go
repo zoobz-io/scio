@@ -58,6 +58,20 @@ func (s *Scio) Buckets() []Resource {
 	return result
 }
 
+// Indexes returns all idx:// resources.
+func (s *Scio) Indexes() []Resource {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	result := make([]Resource, 0, len(s.indexes))
+	for uri := range s.indexes {
+		if r, ok := s.resources[uri]; ok {
+			result = append(result, *r)
+		}
+	}
+	return result
+}
+
 // Spec returns the atom spec for a specific resource.
 // Returns ErrResourceNotFound if the resource is not registered.
 func (s *Scio) Spec(uri string) (atom.Spec, error) {

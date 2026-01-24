@@ -28,6 +28,9 @@ var (
 
 	// ErrKeyNotExpected indicates a key was provided but is not used by the operation.
 	ErrKeyNotExpected = errors.New("key not expected")
+
+	// ErrInvalidUUID indicates the key could not be parsed as a UUID.
+	ErrInvalidUUID = errors.New("invalid UUID")
 )
 
 // Re-export grub errors for convenience.
