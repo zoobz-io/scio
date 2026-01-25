@@ -259,6 +259,43 @@ func TestUpsertVector_VariantMismatch(t *testing.T) {
 	}
 }
 
+func TestUpsertVector_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+	id := uuid.New()
+
+	err := s.UpsertVector(ctx, "idx://nonexistent/"+id.String(), []float32{0.1}, nil)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
+func TestUpsertVector_KeyRequired(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	err := s.UpsertVector(ctx, "idx://embeddings", []float32{0.1}, nil)
+	if !errors.Is(err, ErrKeyRequired) {
+		t.Errorf("expected ErrKeyRequired, got %v", err)
+	}
+}
+
+func TestUpsertVector_InvalidUUID(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	err := s.UpsertVector(ctx, "idx://embeddings/not-a-uuid", []float32{0.1}, nil)
+	if !errors.Is(err, ErrInvalidUUID) {
+		t.Errorf("expected ErrInvalidUUID, got %v", err)
+	}
+}
+
 func TestDeleteVector(t *testing.T) {
 	s := New()
 	index := newMockIndex(embeddingSpec)
@@ -292,6 +329,57 @@ func TestDeleteVector_NotFound(t *testing.T) {
 	}
 }
 
+func TestDeleteVector_VariantMismatch(t *testing.T) {
+	s := New()
+	db := newMockDatabase("users", userSpec)
+	_ = s.RegisterDatabase("db://users", db)
+
+	ctx := context.Background()
+	id := uuid.New()
+
+	err := s.DeleteVector(ctx, "db://users/"+id.String())
+	if !errors.Is(err, ErrVariantMismatch) {
+		t.Errorf("expected ErrVariantMismatch, got %v", err)
+	}
+}
+
+func TestDeleteVector_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+	id := uuid.New()
+
+	err := s.DeleteVector(ctx, "idx://nonexistent/"+id.String())
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
+func TestDeleteVector_KeyRequired(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	err := s.DeleteVector(ctx, "idx://embeddings")
+	if !errors.Is(err, ErrKeyRequired) {
+		t.Errorf("expected ErrKeyRequired, got %v", err)
+	}
+}
+
+func TestDeleteVector_InvalidUUID(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	err := s.DeleteVector(ctx, "idx://embeddings/not-a-uuid")
+	if !errors.Is(err, ErrInvalidUUID) {
+		t.Errorf("expected ErrInvalidUUID, got %v", err)
+	}
+}
+
 func TestVectorExists(t *testing.T) {
 	s := New()
 	index := newMockIndex(embeddingSpec)
@@ -316,6 +404,57 @@ func TestVectorExists(t *testing.T) {
 	}
 	if exists {
 		t.Error("expected exists=false")
+	}
+}
+
+func TestVectorExists_VariantMismatch(t *testing.T) {
+	s := New()
+	db := newMockDatabase("users", userSpec)
+	_ = s.RegisterDatabase("db://users", db)
+
+	ctx := context.Background()
+	id := uuid.New()
+
+	_, err := s.VectorExists(ctx, "db://users/"+id.String())
+	if !errors.Is(err, ErrVariantMismatch) {
+		t.Errorf("expected ErrVariantMismatch, got %v", err)
+	}
+}
+
+func TestVectorExists_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+	id := uuid.New()
+
+	_, err := s.VectorExists(ctx, "idx://nonexistent/"+id.String())
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
+func TestVectorExists_KeyRequired(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	_, err := s.VectorExists(ctx, "idx://embeddings")
+	if !errors.Is(err, ErrKeyRequired) {
+		t.Errorf("expected ErrKeyRequired, got %v", err)
+	}
+}
+
+func TestVectorExists_InvalidUUID(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+
+	_, err := s.VectorExists(ctx, "idx://embeddings/not-a-uuid")
+	if !errors.Is(err, ErrInvalidUUID) {
+		t.Errorf("expected ErrInvalidUUID, got %v", err)
 	}
 }
 
@@ -365,6 +504,16 @@ func TestSearchVectors_KeyNotExpected(t *testing.T) {
 	}
 }
 
+func TestSearchVectors_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	_, err := s.SearchVectors(ctx, "idx://nonexistent", []float32{0.1}, 10, nil)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
 func TestQueryVectors(t *testing.T) {
 	s := New()
 	index := newMockIndex(embeddingSpec)
@@ -396,6 +545,30 @@ func TestQueryVectors_VariantMismatch(t *testing.T) {
 	}
 }
 
+func TestQueryVectors_KeyNotExpected(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+	id := uuid.New()
+
+	_, err := s.QueryVectors(ctx, "idx://embeddings/"+id.String(), []float32{0.1}, 10, nil)
+	if !errors.Is(err, ErrKeyNotExpected) {
+		t.Errorf("expected ErrKeyNotExpected, got %v", err)
+	}
+}
+
+func TestQueryVectors_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	_, err := s.QueryVectors(ctx, "idx://nonexistent", []float32{0.1}, 10, nil)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
 func TestFilterVectors(t *testing.T) {
 	s := New()
 	index := newMockIndex(embeddingSpec)
@@ -424,6 +597,30 @@ func TestFilterVectors_VariantMismatch(t *testing.T) {
 	_, err := s.FilterVectors(ctx, "bcs://documents", nil, 10)
 	if !errors.Is(err, ErrVariantMismatch) {
 		t.Errorf("expected ErrVariantMismatch, got %v", err)
+	}
+}
+
+func TestFilterVectors_KeyNotExpected(t *testing.T) {
+	s := New()
+	index := newMockIndex(embeddingSpec)
+	_ = s.RegisterIndex("idx://embeddings", index)
+
+	ctx := context.Background()
+	id := uuid.New()
+
+	_, err := s.FilterVectors(ctx, "idx://embeddings/"+id.String(), nil, 10)
+	if !errors.Is(err, ErrKeyNotExpected) {
+		t.Errorf("expected ErrKeyNotExpected, got %v", err)
+	}
+}
+
+func TestFilterVectors_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	_, err := s.FilterVectors(ctx, "idx://nonexistent", nil, 10)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
 	}
 }
 
