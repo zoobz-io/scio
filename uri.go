@@ -49,6 +49,8 @@ func parseVariant(scheme string) (Variant, error) {
 		return VariantStore, nil
 	case "bcs":
 		return VariantBucket, nil
+	case "idx":
+		return VariantIndex, nil
 	default:
 		return "", ErrUnknownVariant
 	}
@@ -57,8 +59,8 @@ func parseVariant(scheme string) (Variant, error) {
 // parsePath extracts resource and key from the path based on variant.
 func parsePath(variant Variant, path string) (resource, key string) {
 	switch variant {
-	case VariantDatabase, VariantStore:
-		// db://table/key or kv://store/key
+	case VariantDatabase, VariantStore, VariantIndex:
+		// db://table/key or kv://store/key or idx://index/uuid
 		// First segment is resource, second is key
 		parts := strings.SplitN(path, "/", 2)
 		resource = parts[0]

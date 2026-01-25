@@ -76,6 +76,24 @@ func TestParseURI(t *testing.T) {
 			},
 		},
 		{
+			name:  "index with uuid",
+			input: "idx://embeddings/550e8400-e29b-41d4-a716-446655440000",
+			want: &URI{
+				Variant:  VariantIndex,
+				Resource: "embeddings",
+				Key:      "550e8400-e29b-41d4-a716-446655440000",
+			},
+		},
+		{
+			name:  "index without uuid",
+			input: "idx://vectors",
+			want: &URI{
+				Variant:  VariantIndex,
+				Resource: "vectors",
+				Key:      "",
+			},
+		},
+		{
 			name:    "missing scheme separator",
 			input:   "db/users/123",
 			wantErr: ErrInvalidURI,

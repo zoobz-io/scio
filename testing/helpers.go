@@ -6,10 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/zoobzio/atom"
 	"github.com/zoobzio/edamame"
 	"github.com/zoobzio/grub"
 	"github.com/zoobzio/sentinel"
+	"github.com/zoobzio/vecna"
 )
 
 // WithTimeout creates a context with timeout for tests.
@@ -230,4 +232,90 @@ func TestSpec(name string, fields ...string) atom.Spec {
 		FQDN:   "github.com/test." + name,
 		Fields: fieldMeta,
 	}
+}
+
+// MockIndex implements grub.AtomicIndex for testing.
+type MockIndex struct {
+	TypeSpec atom.Spec
+	Data     map[uuid.UUID]*grub.AtomicVector
+}
+
+// NewMockIndex creates a new mock index.
+func NewMockIndex(spec atom.Spec) *MockIndex {
+	return &MockIndex{
+		TypeSpec: spec,
+		Data:     make(map[uuid.UUID]*grub.AtomicVector),
+	}
+}
+
+// Spec returns the atom spec.
+func (m *MockIndex) Spec() atom.Spec { return m.TypeSpec }
+
+// Get retrieves a vector by ID.
+func (m *MockIndex) Get(_ context.Context, id uuid.UUID) (*grub.AtomicVector, error) {
+	if v, ok := m.Data[id]; ok {
+		return v, nil
+	}
+	return nil, grub.ErrNotFound
+}
+
+// Upsert stores a vector at ID.
+func (m *MockIndex) Upsert(_ context.Context, id uuid.UUID, vector []float32, metadata *atom.Atom) error {
+	m.Data[id] = &grub.AtomicVector{
+		ID:       id,
+		Vector:   vector,
+		Metadata: metadata,
+	}
+	return nil
+}
+
+// Delete removes a vector at ID.
+func (m *MockIndex) Delete(_ context.Context, id uuid.UUID) error {
+	if _, ok := m.Data[id]; !ok {
+		return grub.ErrNotFound
+	}
+	delete(m.Data, id)
+	return nil
+}
+
+// Exists checks if a vector exists at ID.
+func (m *MockIndex) Exists(_ context.Context, id uuid.UUID) (bool, error) {
+	_, ok := m.Data[id]
+	return ok, nil
+}
+
+// Search performs similarity search returning atomized results.
+func (m *MockIndex) Search(_ context.Context, _ []float32, k int, _ *atom.Atom) ([]grub.AtomicVector, error) {
+	var result []grub.AtomicVector
+	for _, v := range m.Data {
+		if len(result) >= k {
+			break
+		}
+		result = append(result, *v)
+	}
+	return result, nil
+}
+
+// Query performs similarity search with vecna filter support.
+func (m *MockIndex) Query(_ context.Context, _ []float32, k int, _ *vecna.Filter) ([]grub.AtomicVector, error) {
+	var result []grub.AtomicVector
+	for _, v := range m.Data {
+		if len(result) >= k {
+			break
+		}
+		result = append(result, *v)
+	}
+	return result, nil
+}
+
+// Filter returns vectors matching the metadata filter without similarity search.
+func (m *MockIndex) Filter(_ context.Context, _ *vecna.Filter, limit int) ([]grub.AtomicVector, error) {
+	var result []grub.AtomicVector
+	for _, v := range m.Data {
+		if len(result) >= limit {
+			break
+		}
+		result = append(result, *v)
+	}
+	return result, nil
 }
