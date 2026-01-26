@@ -246,7 +246,7 @@ func (s *Scio) Query(ctx context.Context, uri string, stmt edamame.QueryStatemen
 		return nil, ErrResourceNotFound
 	}
 
-	return db.Query(ctx, stmt, params)
+	return db.ExecQuery(ctx, stmt, params)
 }
 
 // Select executes a select statement against a database resource.
@@ -276,7 +276,7 @@ func (s *Scio) Select(ctx context.Context, uri string, stmt edamame.SelectStatem
 		return nil, ErrResourceNotFound
 	}
 
-	return db.Select(ctx, stmt, params)
+	return db.ExecSelect(ctx, stmt, params)
 }
 
 // Put stores a blob object at the given bcs:// URI.
