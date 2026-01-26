@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/zoobzio/atom"
+	"github.com/zoobzio/edamame"
 	"github.com/zoobzio/grub"
 )
 
@@ -238,6 +239,82 @@ func TestQuery_VariantMismatch(t *testing.T) {
 	_, err := s.Query(ctx, "kv://sessions", grub.QueryAll, nil)
 	if !errors.Is(err, ErrVariantMismatch) {
 		t.Errorf("expected ErrVariantMismatch, got %v", err)
+	}
+}
+
+func TestQuery_KeyNotExpected(t *testing.T) {
+	s := New()
+	db := newMockDatabase("users", userSpec)
+	_ = s.RegisterDatabase("db://users", db)
+
+	ctx := context.Background()
+
+	_, err := s.Query(ctx, "db://users/123", grub.QueryAll, nil)
+	if !errors.Is(err, ErrKeyNotExpected) {
+		t.Errorf("expected ErrKeyNotExpected, got %v", err)
+	}
+}
+
+func TestQuery_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	_, err := s.Query(ctx, "db://nonexistent", grub.QueryAll, nil)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
+	}
+}
+
+func TestSelect(t *testing.T) {
+	s := New()
+	db := newMockDatabase("users", userSpec)
+	_ = s.RegisterDatabase("db://users", db)
+
+	ctx := context.Background()
+	db.data["1"] = &atom.Atom{Strings: map[string]string{"Name": "Alice"}}
+
+	result, err := s.Select(ctx, "db://users", edamame.SelectStatement{}, nil)
+	if err != nil {
+		t.Fatalf("Select failed: %v", err)
+	}
+	if result == nil {
+		t.Error("expected non-nil result")
+	}
+}
+
+func TestSelect_VariantMismatch(t *testing.T) {
+	s := New()
+	store := newMockStore(sessionSpec)
+	_ = s.RegisterStore("kv://sessions", store)
+
+	ctx := context.Background()
+
+	_, err := s.Select(ctx, "kv://sessions", edamame.SelectStatement{}, nil)
+	if !errors.Is(err, ErrVariantMismatch) {
+		t.Errorf("expected ErrVariantMismatch, got %v", err)
+	}
+}
+
+func TestSelect_KeyNotExpected(t *testing.T) {
+	s := New()
+	db := newMockDatabase("users", userSpec)
+	_ = s.RegisterDatabase("db://users", db)
+
+	ctx := context.Background()
+
+	_, err := s.Select(ctx, "db://users/123", edamame.SelectStatement{}, nil)
+	if !errors.Is(err, ErrKeyNotExpected) {
+		t.Errorf("expected ErrKeyNotExpected, got %v", err)
+	}
+}
+
+func TestSelect_ResourceNotFound(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	_, err := s.Select(ctx, "db://nonexistent", edamame.SelectStatement{}, nil)
+	if !errors.Is(err, ErrResourceNotFound) {
+		t.Errorf("expected ErrResourceNotFound, got %v", err)
 	}
 }
 
