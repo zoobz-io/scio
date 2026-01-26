@@ -50,14 +50,14 @@ func (m *mockDatabase) Exists(_ context.Context, key string) (bool, error) {
 	_, ok := m.data[key]
 	return ok, nil
 }
-func (m *mockDatabase) Query(_ context.Context, _ edamame.QueryStatement, _ map[string]any) ([]*atom.Atom, error) {
+func (m *mockDatabase) ExecQuery(_ context.Context, _ edamame.QueryStatement, _ map[string]any) ([]*atom.Atom, error) {
 	result := make([]*atom.Atom, 0, len(m.data))
 	for _, a := range m.data {
 		result = append(result, a)
 	}
 	return result, nil
 }
-func (m *mockDatabase) Select(_ context.Context, _ edamame.SelectStatement, _ map[string]any) (*atom.Atom, error) {
+func (m *mockDatabase) ExecSelect(_ context.Context, _ edamame.SelectStatement, _ map[string]any) (*atom.Atom, error) {
 	for _, a := range m.data {
 		return a, nil
 	}
