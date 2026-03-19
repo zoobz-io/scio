@@ -42,4 +42,5 @@ var (
 	ErrInvalidKey      = grub.ErrInvalidKey
 	ErrReadOnly        = grub.ErrReadOnly
 	ErrTTLNotSupported = grub.ErrTTLNotSupported
+	ErrInvalidQuery    = grub.ErrInvalidQuery
 )

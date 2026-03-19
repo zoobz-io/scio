@@ -10,6 +10,7 @@ import (
 	"github.com/zoobzio/atom"
 	"github.com/zoobzio/edamame"
 	"github.com/zoobzio/grub"
+	"github.com/zoobzio/lucene"
 	"github.com/zoobzio/sentinel"
 	"github.com/zoobzio/vecna"
 )
@@ -316,6 +317,69 @@ func (m *MockIndex) Filter(_ context.Context, _ *vecna.Filter, limit int) ([]gru
 			break
 		}
 		result = append(result, *v)
+	}
+	return result, nil
+}
+
+// MockSearch implements grub.AtomicSearch for testing.
+type MockSearch struct {
+	IndexName string
+	TypeSpec  atom.Spec
+	Data      map[string]*grub.AtomicDocument
+}
+
+// NewMockSearch creates a new mock search.
+func NewMockSearch(indexName string, spec atom.Spec) *MockSearch {
+	return &MockSearch{
+		IndexName: indexName,
+		TypeSpec:  spec,
+		Data:      make(map[string]*grub.AtomicDocument),
+	}
+}
+
+// Index returns the index name.
+func (m *MockSearch) Index() string { return m.IndexName }
+
+// Spec returns the atom spec.
+func (m *MockSearch) Spec() atom.Spec { return m.TypeSpec }
+
+// Get retrieves a document by ID.
+func (m *MockSearch) Get(_ context.Context, id string) (*grub.AtomicDocument, error) {
+	if doc, ok := m.Data[id]; ok {
+		return doc, nil
+	}
+	return nil, grub.ErrNotFound
+}
+
+// IndexDoc stores a document at ID.
+func (m *MockSearch) IndexDoc(_ context.Context, id string, doc *atom.Atom) error {
+	m.Data[id] = &grub.AtomicDocument{
+		ID:      id,
+		Content: doc,
+	}
+	return nil
+}
+
+// Delete removes a document at ID.
+func (m *MockSearch) Delete(_ context.Context, id string) error {
+	if _, ok := m.Data[id]; !ok {
+		return grub.ErrNotFound
+	}
+	delete(m.Data, id)
+	return nil
+}
+
+// Exists checks if a document exists at ID.
+func (m *MockSearch) Exists(_ context.Context, id string) (bool, error) {
+	_, ok := m.Data[id]
+	return ok, nil
+}
+
+// Search performs a search returning all documents.
+func (m *MockSearch) Search(_ context.Context, _ *lucene.Search) ([]grub.AtomicDocument, error) {
+	result := make([]grub.AtomicDocument, 0, len(m.Data))
+	for _, doc := range m.Data {
+		result = append(result, *doc)
 	}
 	return result, nil
 }

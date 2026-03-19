@@ -13,6 +13,7 @@ type Scio struct {
 	stores    map[string]grub.AtomicStore
 	buckets   map[string]grub.AtomicBucket
 	indexes   map[string]grub.AtomicIndex
+	searches  map[string]grub.AtomicSearch
 	resources map[string]*Resource
 	specs     map[string][]*Resource // FQDN -> resources with that spec
 	mu        sync.RWMutex
@@ -25,6 +26,7 @@ func New() *Scio {
 		stores:    make(map[string]grub.AtomicStore),
 		buckets:   make(map[string]grub.AtomicBucket),
 		indexes:   make(map[string]grub.AtomicIndex),
+		searches:  make(map[string]grub.AtomicSearch),
 		resources: make(map[string]*Resource),
 		specs:     make(map[string][]*Resource),
 	}
@@ -215,4 +217,49 @@ func (s *Scio) RegisterIndex(uri string, index grub.AtomicIndex, opts ...Registr
 func (s *Scio) getIndex(resourceURI string) (grub.AtomicIndex, bool) {
 	index, ok := s.indexes[resourceURI]
 	return index, ok
+}
+
+// RegisterSearch registers an atomic search at the given URI.
+// The URI should be in the form srch://index.
+func (s *Scio) RegisterSearch(uri string, search grub.AtomicSearch, opts ...RegistrationOption) error {
+	parsed, err := ParseURI(uri)
+	if err != nil {
+		return err
+	}
+
+	if parsed.Variant != VariantSearch {
+		return ErrVariantMismatch
+	}
+
+	resourceURI := parsed.ResourceURI()
+	cfg := applyOptions(opts)
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, exists := s.resources[resourceURI]; exists {
+		return ErrResourceExists
+	}
+
+	spec := search.Spec()
+	resource := &Resource{
+		URI:      resourceURI,
+		Variant:  VariantSearch,
+		Name:     parsed.Resource,
+		Spec:     spec,
+		Metadata: cfg.metadata,
+	}
+
+	s.searches[resourceURI] = search
+	s.resources[resourceURI] = resource
+	s.trackSpec(spec, resource)
+
+	return nil
+}
+
+// getSearch retrieves a search by resource URI.
+// Caller must hold at least a read lock.
+func (s *Scio) getSearch(resourceURI string) (grub.AtomicSearch, bool) {
+	search, ok := s.searches[resourceURI]
+	return search, ok
 }
