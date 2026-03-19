@@ -62,7 +62,7 @@ changelog:
 
 release:
   github:
-    owner: zoobzio
+    owner: zoobz-io
     name: scio
 
   name_template: "{{ .ProjectName }} v{{ .Version }}"
@@ -78,7 +78,7 @@ release:
     ### Installation
 
     ```bash
-    go get github.com/zoobzio/scio@v{{ .Version }}
+    go get github.com/zoobz-io/scio@v{{ .Version }}
     ```
 
     ### Requirements
@@ -87,7 +87,7 @@ release:
   footer: |
     ---
 
-    **Full Documentation:** https://github.com/zoobzio/scio/tree/v{{ .Version }}/README.md
+    **Full Documentation:** https://github.com/zoobz-io/scio/tree/v{{ .Version }}/README.md
 
     Thanks to all contributors!
 

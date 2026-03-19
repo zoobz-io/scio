@@ -2,6 +2,18 @@ repository:
   name: scio
   description: URI-based data catalog with atomic operations for Go
   homepage: https://github.com/zoobzio/scio
+  topics:
+    - go
+    - golang
+    - data-catalog
+    - storage
+    - uri
+    - sql
+    - key-value
+    - blob-storage
+    - vector-search
+    - opensearch
+    - elasticsearch
   has_wiki: true
   has_downloads: true
   default_branch: main

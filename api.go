@@ -10,6 +10,7 @@ import (
 	"github.com/zoobzio/atom"
 	"github.com/zoobzio/edamame"
 	"github.com/zoobzio/grub"
+	"github.com/zoobzio/lucene"
 	"github.com/zoobzio/vecna"
 )
 
@@ -28,6 +29,9 @@ const (
 
 	// VariantIndex represents vector index storage (idx://).
 	VariantIndex Variant = "idx"
+
+	// VariantSearch represents full-text search storage (srch://).
+	VariantSearch Variant = "srch"
 )
 
 // URI represents a parsed data address.
@@ -69,6 +73,9 @@ type Catalog interface {
 
 	// Indexes returns all idx:// resources.
 	Indexes() []Resource
+
+	// Searches returns all srch:// resources.
+	Searches() []Resource
 
 	// Spec returns the atom spec for a specific resource.
 	Spec(uri string) (atom.Spec, error)
@@ -134,6 +141,10 @@ type Registry interface {
 	// RegisterIndex registers an atomic index at the given URI.
 	// The URI should be in the form idx://index.
 	RegisterIndex(uri string, index grub.AtomicIndex, opts ...RegistrationOption) error
+
+	// RegisterSearch registers an atomic search at the given URI.
+	// The URI should be in the form srch://index.
+	RegisterSearch(uri string, search grub.AtomicSearch, opts ...RegistrationOption) error
 }
 
 // IndexOperations defines vector index access operations.
@@ -168,4 +179,29 @@ type IndexOperations interface {
 	// FilterVectors returns vectors matching the metadata filter without similarity search.
 	// The URI should reference the index without a key component.
 	FilterVectors(ctx context.Context, uri string, filter *vecna.Filter, limit int) ([]grub.AtomicVector, error)
+}
+
+// SearchOperations defines full-text search access operations.
+type SearchOperations interface {
+	// GetDocument retrieves a document at the given srch:// URI.
+	// The URI should include a document ID key component.
+	// Returns ErrNotFound if the ID does not exist.
+	GetDocument(ctx context.Context, uri string) (*grub.AtomicDocument, error)
+
+	// IndexDocument stores a document with atomized content at the given srch:// URI.
+	// The URI should include a document ID key component.
+	IndexDocument(ctx context.Context, uri string, data *atom.Atom) error
+
+	// DeleteDocument removes the document at the given srch:// URI.
+	// The URI should include a document ID key component.
+	// Returns ErrNotFound if the ID does not exist.
+	DeleteDocument(ctx context.Context, uri string) error
+
+	// DocumentExists checks whether a document exists at the given srch:// URI.
+	// The URI should include a document ID key component.
+	DocumentExists(ctx context.Context, uri string) (bool, error)
+
+	// SearchDocuments performs a full-text search against a srch:// resource.
+	// The URI should reference the search index without a key component.
+	SearchDocuments(ctx context.Context, uri string, search *lucene.Search) ([]grub.AtomicDocument, error)
 }

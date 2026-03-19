@@ -72,6 +72,20 @@ func (s *Scio) Indexes() []Resource {
 	return result
 }
 
+// Searches returns all srch:// resources.
+func (s *Scio) Searches() []Resource {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	result := make([]Resource, 0, len(s.searches))
+	for uri := range s.searches {
+		if r, ok := s.resources[uri]; ok {
+			result = append(result, *r)
+		}
+	}
+	return result
+}
+
 // Spec returns the atom spec for a specific resource.
 // Returns ErrResourceNotFound if the resource is not registered.
 func (s *Scio) Spec(uri string) (atom.Spec, error) {

@@ -54,6 +54,17 @@ func (s *Scio) Get(ctx context.Context, uri string) (*atom.Atom, error) {
 		}
 		return obj.Data, nil
 
+	case VariantSearch:
+		search, ok := s.getSearch(resourceURI)
+		if !ok {
+			return nil, ErrResourceNotFound
+		}
+		doc, err := search.Get(ctx, parsed.Key)
+		if err != nil {
+			return nil, err
+		}
+		return doc.Content, nil
+
 	default:
 		return nil, ErrUnknownVariant
 	}
@@ -95,6 +106,9 @@ func (s *Scio) Set(ctx context.Context, uri string, data *atom.Atom) error {
 
 	case VariantBucket:
 		return ErrVariantMismatch // Use Put for buckets
+
+	case VariantSearch:
+		return ErrVariantMismatch // Use IndexDocument for search
 
 	default:
 		return ErrUnknownVariant
@@ -170,6 +184,13 @@ func (s *Scio) Delete(ctx context.Context, uri string) error {
 		}
 		return bucket.Delete(ctx, parsed.Key)
 
+	case VariantSearch:
+		search, ok := s.getSearch(resourceURI)
+		if !ok {
+			return ErrResourceNotFound
+		}
+		return search.Delete(ctx, parsed.Key)
+
 	default:
 		return ErrUnknownVariant
 	}
@@ -213,6 +234,13 @@ func (s *Scio) Exists(ctx context.Context, uri string) (bool, error) {
 			return false, ErrResourceNotFound
 		}
 		return bucket.Exists(ctx, parsed.Key)
+
+	case VariantSearch:
+		search, ok := s.getSearch(resourceURI)
+		if !ok {
+			return false, ErrResourceNotFound
+		}
+		return search.Exists(ctx, parsed.Key)
 
 	default:
 		return false, ErrUnknownVariant

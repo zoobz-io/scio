@@ -8,16 +8,17 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/zoobzio/atom v1.0.0
 	github.com/zoobzio/edamame v1.0.1
-	github.com/zoobzio/grub v0.1.3
-	github.com/zoobzio/sentinel v1.0.2
+	github.com/zoobzio/grub v0.1.10
+	github.com/zoobzio/lucene v0.0.1
+	github.com/zoobzio/sentinel v1.0.3
 	github.com/zoobzio/vecna v0.0.2
 )
 
 require (
 	github.com/jmoiron/sqlx v1.4.0 // indirect
-	github.com/zoobzio/astql v1.0.5 // indirect
+	github.com/zoobzio/astql v1.0.6 // indirect
 	github.com/zoobzio/capitan v1.0.0 // indirect
 	github.com/zoobzio/dbml v1.0.0 // indirect
-	github.com/zoobzio/soy v1.0.2 // indirect
+	github.com/zoobzio/soy v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
