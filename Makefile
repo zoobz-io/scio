@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-integration test-bench lint lint-fix security coverage clean help check ci install-tools install-hooks
+.PHONY: test test-unit test-integration lint lint-fix security coverage clean help check ci install-tools install-hooks
 
 .DEFAULT_GOAL := help
 
@@ -15,9 +15,6 @@ test-unit: ## Run unit tests only (short mode)
 
 test-integration: ## Run integration tests
 	@go test -v -tags testing -timeout=10m ./testing/integration/...
-
-test-bench: ## Run benchmark tests
-	@go test -v -race -tags testing -timeout=10m ./testing/benchmarks/...
 
 lint: ## Run linters
 	@golangci-lint run --config=.golangci.yml --timeout=5m
