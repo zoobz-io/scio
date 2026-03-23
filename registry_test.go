@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/edamame"
-	"github.com/zoobzio/grub"
-	"github.com/zoobzio/sentinel"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/edamame"
+	"github.com/zoobz-io/grub"
+	"github.com/zoobz-io/sentinel"
 )
 
 // mockDatabase implements grub.AtomicDatabase for testing.

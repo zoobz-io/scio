@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/grub"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/grub"
 )
 
 func TestWithTimeout(t *testing.T) {

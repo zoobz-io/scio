@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/grub"
-	"github.com/zoobzio/lucene"
-	"github.com/zoobzio/sentinel"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/grub"
+	"github.com/zoobz-io/lucene"
+	"github.com/zoobz-io/sentinel"
 )
 
 // mockSearch implements grub.AtomicSearch for testing.

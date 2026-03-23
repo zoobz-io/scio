@@ -3,7 +3,7 @@ package scio
 import (
 	"errors"
 
-	"github.com/zoobzio/grub"
+	"github.com/zoobz-io/grub"
 )
 
 // Semantic errors for scio operations.

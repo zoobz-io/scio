@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/grub"
-	"github.com/zoobzio/sentinel"
-	"github.com/zoobzio/vecna"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/grub"
+	"github.com/zoobz-io/sentinel"
+	"github.com/zoobz-io/vecna"
 )
 
 // mockIndex implements grub.AtomicIndex for testing.

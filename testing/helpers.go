@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/edamame"
-	"github.com/zoobzio/grub"
-	"github.com/zoobzio/lucene"
-	"github.com/zoobzio/sentinel"
-	"github.com/zoobzio/vecna"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/edamame"
+	"github.com/zoobz-io/grub"
+	"github.com/zoobz-io/lucene"
+	"github.com/zoobz-io/sentinel"
+	"github.com/zoobz-io/vecna"
 )
 
 // WithTimeout creates a context with timeout for tests.

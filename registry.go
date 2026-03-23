@@ -3,8 +3,8 @@ package scio
 import (
 	"sync"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/grub"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/grub"
 )
 
 // Scio is the central data catalog and access point.

@@ -18,7 +18,7 @@ testing/
 ### Assertion Helpers
 
 ```go
-import st "github.com/zoobzio/scio/testing"
+import st "github.com/zoobz-io/scio/testing"
 
 func TestSomething(t *testing.T) {
     ctx := st.WithTimeout(t, 5*time.Second)
