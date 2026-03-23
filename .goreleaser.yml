@@ -1,109 +1,39 @@
-# GoReleaser configuration for scio - URI-based data catalog with atomic operations
-
 version: 2
-
-project_name: scio
 
 builds:
   - skip: true
 
-archives:
-  - id: source
-    files:
-      - "*.go"
-      - "go.mod"
-      - "go.sum"
-      - "LICENSE"
-      - "README.md"
-      - "Makefile"
-      - ".golangci.yml"
-    name_template: "{{ .ProjectName }}_{{ .Version }}_source"
-
-checksum:
-  name_template: "checksums.txt"
-  algorithm: sha256
-
 changelog:
-  use: github
   sort: asc
-  abbrev: 7
   groups:
-    - title: "Features"
+    - title: Features
       regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
       order: 0
-    - title: "Bug Fixes"
+    - title: Bug Fixes
       regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
       order: 1
-    - title: "Performance"
-      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+    - title: Documentation
+      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
       order: 2
-    - title: "Refactoring"
-      regexp: '^.*?refactor(\([[:word:]]+\))??!?:.+$'
-      order: 3
-    - title: "Documentation"
-      regexp: '^.*?docs?(\([[:word:]]+\))??!?:.+$'
-      order: 4
-    - title: "Testing"
-      regexp: '^.*?test(\([[:word:]]+\))??!?:.+$'
-      order: 5
-    - title: "Maintenance"
-      regexp: '^.*?chore(\([[:word:]]+\))??!?:.+$'
-      order: 6
-    - title: "Other Changes"
+    - title: Others
       order: 999
   filters:
     exclude:
       - "^docs:"
       - "^test:"
-      - "^Merge"
-      - "^merge"
-      - "^wip"
-      - "^WIP"
+      - "^chore:"
+      - "^ci:"
 
 release:
   github:
     owner: zoobz-io
     name: scio
-
-  name_template: "{{ .ProjectName }} v{{ .Version }}"
   draft: false
   prerelease: auto
-  mode: append
-
   header: |
-    ## scio v{{ .Version }}
-
-    URI-based data catalog with atomic operations for Go.
-
-    ### Installation
-
-    ```bash
-    go get github.com/zoobz-io/scio@v{{ .Version }}
-    ```
-
-    ### Requirements
-    - Go 1.24 or higher
-
+    ## What's Changed
   footer: |
-    ---
-
-    **Full Documentation:** https://github.com/zoobz-io/scio/tree/v{{ .Version }}/README.md
-
-    Thanks to all contributors!
-
-announce:
-  skip: true
-
-snapshot:
-  version_template: "{{ .Tag }}-next"
-
-source:
-  enabled: true
-  name_template: "{{ .ProjectName }}_{{ .Version }}_source"
-
-git:
-  tag_sort: -version:refname
-  ignore_tags:
-    - ".*-rc.*"
-    - ".*-beta.*"
-    - ".*-alpha.*"
+    ## Installation
+    ```bash
+    go get github.com/zoobz-io/scio@{{ .Tag }}
+    ```

@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/edamame"
-	"github.com/zoobzio/grub"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/edamame"
+	"github.com/zoobz-io/grub"
 )
 
 // Get retrieves an atom at the given URI.

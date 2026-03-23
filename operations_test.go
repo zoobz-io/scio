@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/edamame"
-	"github.com/zoobzio/grub"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/edamame"
+	"github.com/zoobz-io/grub"
 )
 
 func TestGet_Database(t *testing.T) {

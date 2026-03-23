@@ -1,13 +1,13 @@
 # scio
 
-[![CI](https://github.com/zoobzio/scio/actions/workflows/ci.yml/badge.svg)](https://github.com/zoobzio/scio/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/zoobzio/scio/branch/main/graph/badge.svg)](https://codecov.io/gh/zoobzio/scio)
-[![Go Report Card](https://goreportcard.com/badge/github.com/zoobzio/scio)](https://goreportcard.com/report/github.com/zoobzio/scio)
-[![CodeQL](https://github.com/zoobzio/scio/actions/workflows/codeql.yml/badge.svg)](https://github.com/zoobzio/scio/actions/workflows/codeql.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/zoobzio/scio.svg)](https://pkg.go.dev/github.com/zoobzio/scio)
+[![CI](https://github.com/zoobz-io/scio/actions/workflows/ci.yml/badge.svg)](https://github.com/zoobz-io/scio/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/zoobz-io/scio/branch/main/graph/badge.svg)](https://codecov.io/gh/zoobz-io/scio)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zoobz-io/scio)](https://goreportcard.com/report/github.com/zoobz-io/scio)
+[![CodeQL](https://github.com/zoobz-io/scio/actions/workflows/codeql.yml/badge.svg)](https://github.com/zoobz-io/scio/actions/workflows/codeql.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/zoobz-io/scio.svg)](https://pkg.go.dev/github.com/zoobz-io/scio)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/zoobzio/scio)](https://go.dev/)
-[![Release](https://img.shields.io/github/v/release/zoobzio/scio)](https://github.com/zoobzio/scio/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/zoobz-io/scio)](https://go.dev/)
+[![Release](https://img.shields.io/github/v/release/zoobz-io/scio)](https://github.com/zoobz-io/scio/releases)
 
 URI-based data catalog with atomic operations for Go.
 
@@ -41,7 +41,7 @@ s.Related("db://users")        // other resources with same spec
 ## Install
 
 ```bash
-go get github.com/zoobzio/scio
+go get github.com/zoobz-io/scio
 ```
 
 Requires Go 1.24 or higher.
@@ -55,8 +55,8 @@ import (
     "context"
     "fmt"
 
-    "github.com/zoobzio/grub"
-    "github.com/zoobzio/scio"
+    "github.com/zoobz-io/grub"
+    "github.com/zoobz-io/scio"
 )
 
 func main() {

@@ -3,9 +3,9 @@ package scio
 import (
 	"context"
 
-	"github.com/zoobzio/atom"
-	"github.com/zoobzio/grub"
-	"github.com/zoobzio/lucene"
+	"github.com/zoobz-io/atom"
+	"github.com/zoobz-io/grub"
+	"github.com/zoobz-io/lucene"
 )
 
 // GetDocument retrieves a document at the given srch:// URI.

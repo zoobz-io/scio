@@ -1,7 +1,7 @@
 package scio
 
 import (
-	"github.com/zoobzio/atom"
+	"github.com/zoobz-io/atom"
 )
 
 // Sources returns all registered resources.
